@@ -13,13 +13,6 @@ import SwiftSyntaxMacros
 
 public struct AutoStubMacro: MemberMacro {
 
-    public enum AccessLevel: CaseIterable {
-        case `public`
-        case `internal`
-        case `private`
-        case `fileprivate`
-    }
-
     public static func expansion(
         of attribute: AttributeSyntax,
         providingMembersOf declaration: some DeclGroupSyntax,
@@ -58,21 +51,22 @@ public struct AutoStubMacro: MemberMacro {
 
         guard !properties.isEmpty else { return [] }
 
-        let accessLevelExpression = attribute.argumentList?
-            .first?.expression
-            .as(MemberAccessExprSyntax.self)
-        let accessLevel = accessLevelExpression?.declName.baseName.text.appending(" ") ?? ""
+        let accessLevel = (attribute.stubAccessLevel ?? declaration.accessLevel)?.appending(" ") ?? ""
 
         let initSyntax: DeclSyntax = """
+        #if DEBUG
         \(raw: accessLevel)static func stub(
         \(raw: makeParameters(for: properties))
         ) -> \(name) {
+        \(name)(
         \(
             raw: properties
-                .map { "self.\($0.identifier) = \($0.identifier)" }
-                .joined(separator: "\n")
+                .map { "\($0.identifier): \($0.identifier)" }
+                .joined(separator: ",\n")
+        )
         )
         }
+        #endif
         """
 
         return [initSyntax]
@@ -83,6 +77,8 @@ public struct AutoStubMacro: MemberMacro {
             .map { property in
                 if let stub = property.attribute(named: "Stub"), let value = stub.argumentList?.first {
                     return "\(property.bindings.map { "\($0.with(\.initializer, nil))" } .joined())= \(value.expression)"
+                } else if let _ = property.attribute(named: "Stub") {
+                    return "\(property.bindings.map { "\($0.with(\.initializer, nil))" } .joined())= .stub()"
                 } else if property.isOptional, property.defaultInitializerValue == nil {
                     return "\(property.bindings) = nil"
                 } else {
@@ -90,18 +86,6 @@ public struct AutoStubMacro: MemberMacro {
                 }
             }
             .joined(separator: ",\n")
-    }
-}
-
-public struct StubAttribute: MemberAttributeMacro {
-
-    public static func expansion(
-        of node: AttributeSyntax,
-        attachedTo declaration: some DeclGroupSyntax,
-        providingAttributesFor member: some DeclSyntaxProtocol,
-        in context: some MacroExpansionContext
-    ) throws -> [AttributeSyntax] {
-        return []
     }
 }
 
@@ -132,6 +116,52 @@ extension AutoStubMacro {
     }
 }
 
+public struct AutoStubAttribute: PeerMacro {
+
+    public static func expansion(
+        of node: AttributeSyntax,
+        providingPeersOf declaration: some DeclSyntaxProtocol,
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+        guard declaration.is(VariableDeclSyntax.self) else {
+            context.diagnose(
+                .init(
+                    node: node._syntaxNode,
+                    message: Diagnostic.notProperty
+                )
+            )
+
+            return []
+        }
+
+        return []
+    }
+}
+
+extension AutoStubAttribute {
+    enum Diagnostic: String, Error, DiagnosticMessage {
+        case notProperty
+
+        var severity: DiagnosticSeverity {
+            switch self {
+            case .notProperty:
+                return .error
+            }
+        }
+
+        var message: String {
+            switch self {
+            case .notProperty:
+                return "@Stub can only be applied to properties."
+            }
+        }
+
+        var diagnosticID: MessageID {
+            .init(domain: "MacroBreweryMacros", id: rawValue)
+        }
+    }
+}
+
 private extension DeclGroupSyntax {
 
     var supportsAutoStub: Bool {
@@ -141,5 +171,16 @@ private extension DeclGroupSyntax {
         default:
             return false
         }
+    }
+}
+
+private extension AttributeSyntax {
+
+    var stubAccessLevel: String? {
+        return argumentList?
+            .first?
+            .expression
+            .as(StringLiteralExprSyntax.self)?
+            .representedLiteralValue
     }
 }

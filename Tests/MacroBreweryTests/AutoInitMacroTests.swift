@@ -18,7 +18,7 @@ final class AutoInitMacroTests: XCTestCase {
         #if canImport(MacroBreweryMacros)
         assertMacroExpansion(
             """
-            @AutoInit(accessLevel: .public)
+            @AutoInit(accessLevel: "public")
             public struct Cat {
                 public var age: Int
                 public var name: String?
@@ -56,7 +56,7 @@ final class AutoInitMacroTests: XCTestCase {
         #if canImport(MacroBreweryMacros)
         assertMacroExpansion(
             """
-            @AutoInit(accessLevel: .private)
+            @AutoInit(accessLevel: "private")
             public struct Cat {
                 public var age: Int
                 public var name: String?
@@ -100,6 +100,10 @@ final class AutoInitMacroTests: XCTestCase {
                 public var name: String?
                 public var soft: Bool
                 public var fuzzy: Bool = true
+
+                public var isSoftAndFuzzy: Bool {
+                    return soft && fuzzy
+                }
             }
             """,
             expandedSource:
@@ -110,7 +114,11 @@ final class AutoInitMacroTests: XCTestCase {
                 public var soft: Bool
                 public var fuzzy: Bool = true
 
-                init(
+                public var isSoftAndFuzzy: Bool {
+                    return soft && fuzzy
+                }
+
+                public init(
                     age: Int,
                     name: String? = nil,
                     soft: Bool,

@@ -13,13 +13,6 @@ import SwiftSyntaxMacros
 
 public struct AutoInitMacro: MemberMacro {
 
-    public enum AccessLevel: CaseIterable {
-        case `public`
-        case `internal`
-        case `private`
-        case `fileprivate`
-    }
-
     public static func expansion(
         of attribute: AttributeSyntax,
         providingMembersOf declaration: some DeclGroupSyntax,
@@ -55,10 +48,7 @@ public struct AutoInitMacro: MemberMacro {
 
         guard !properties.isEmpty else { return [] }
 
-        let accessLevelExpression = attribute.argumentList?
-            .first?.expression
-            .as(MemberAccessExprSyntax.self)
-        let accessLevel = accessLevelExpression?.declName.baseName.text.appending(" ") ?? ""
+        let accessLevel = (attribute.initAccessLevel ?? declaration.accessLevel)?.appending(" ") ?? ""
 
         let initSyntax: DeclSyntax = """
         \(raw: accessLevel)init(
@@ -124,5 +114,16 @@ private extension DeclGroupSyntax {
         default:
             return false
         }
+    }
+}
+
+private extension AttributeSyntax {
+
+    var initAccessLevel: String? {
+        return argumentList?
+            .first?
+            .expression
+            .as(StringLiteralExprSyntax.self)?
+            .representedLiteralValue
     }
 }

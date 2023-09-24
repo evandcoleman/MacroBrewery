@@ -11,6 +11,10 @@ let package = Package(
             name: "MacroBrewery",
             targets: ["MacroBrewery"]
         ),
+        .executable(
+            name: "MacroBreweryClient",
+            targets: ["MacroBreweryClient"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-syntax.git", from: "509.0.0"),
@@ -20,10 +24,17 @@ let package = Package(
             name: "MacroBreweryMacros",
             dependencies: [
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-                .product(name: "SwiftCompilerPlugin", package: "swift-syntax")
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
             ]
         ),
-        .target(name: "MacroBrewery", dependencies: ["MacroBreweryMacros"]),
+        .target(
+            name: "MacroBrewery",
+            dependencies: ["MacroBreweryMacros"]
+        ),
+        .executableTarget(
+            name: "MacroBreweryClient",
+            dependencies: ["MacroBrewery"]
+        ),
         .testTarget(
             name: "MacroBreweryTests",
             dependencies: [

@@ -38,6 +38,10 @@ extension DeclGroupSyntax {
             .compactMap { $0.decl.as(AssociatedTypeDeclSyntax.self) }
     }
 
+    var inheritedTypes: [TypeSyntax] {
+        return inheritanceClause?.inheritedTypes.map(\.type) ?? []
+    }
+
     var declarationName: TokenSyntax? {
         if let declaration = self.as(ClassDeclSyntax.self) {
             return declaration.name.trimmed
@@ -48,5 +52,30 @@ extension DeclGroupSyntax {
         }
 
         return nil
+    }
+
+    var accessLevel: String? {
+        return modifiers
+            .compactMap { $0.as(DeclModifierSyntax.self)?.name.tokenKind }
+            .compactMap { token -> String? in
+                switch token {
+                case .keyword(let keyword):
+                    switch keyword {
+                    case .public:
+                        return "public"
+                    case .private:
+                        return "private"
+                    case .internal:
+                        return "internal"
+                    case .fileprivate:
+                        return "fileprivate"
+                    default:
+                        return nil
+                    }
+                default:
+                    return nil
+                }
+            }
+            .first
     }
 }

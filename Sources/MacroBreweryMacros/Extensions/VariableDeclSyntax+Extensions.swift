@@ -11,7 +11,7 @@ extension VariableDeclSyntax {
 
     var isComputed: Bool {
         return bindings
-            .contains { $0.accessorBlock?.is(CodeBlockSyntax.self) == true }
+            .contains { $0.accessorBlock?.as(AccessorBlockSyntax.self)?.accessors.as(CodeBlockItemListSyntax.self)?.isEmpty == false }
     }
 
     var isStored: Bool {
