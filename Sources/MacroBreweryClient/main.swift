@@ -8,6 +8,16 @@
 import Foundation
 import MacroBrewery
 
+@AutoTypeErase
+public protocol Animal {
+    var age: Int { get }
+    var name: String? { get }
+    var soft: Bool { get }
+
+    func pet() async throws
+    func feed(_ completion: @escaping () -> Void) -> Any
+}
+
 @AutoInit
 @AutoStub
 public struct Household {

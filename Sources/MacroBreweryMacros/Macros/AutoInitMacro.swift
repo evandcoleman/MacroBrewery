@@ -30,6 +30,7 @@ public struct AutoInitMacro: MemberMacro {
         }
 
         let properties = declaration
+            .memberBlock
             .storedProperties
             .filter { property in
                 if property.type == nil {
@@ -48,7 +49,7 @@ public struct AutoInitMacro: MemberMacro {
 
         guard !properties.isEmpty else { return [] }
 
-        let accessLevel = (attribute.initAccessLevel ?? declaration.accessLevel)?.appending(" ") ?? ""
+        let accessLevel = (attribute.initAccessLevel ?? declaration.modifiersProvider.accessLevel)?.appending(" ") ?? ""
 
         let initSyntax: DeclSyntax = """
         \(raw: accessLevel)init(

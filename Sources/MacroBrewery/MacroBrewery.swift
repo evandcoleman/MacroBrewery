@@ -43,6 +43,14 @@ public macro Stub() = #externalMacro(
     type: "AutoStubAttribute"
 )
 
+@attached(peer, names: prefixed(Any))
+public macro AutoTypeErase(
+    accessLevel: String? = nil
+) = #externalMacro(
+    module: "MacroBreweryMacros",
+    type: "AutoTypeEraseMacro"
+)
+
 @freestanding(expression)
 public macro testEach<T>(
     _ items: [T],

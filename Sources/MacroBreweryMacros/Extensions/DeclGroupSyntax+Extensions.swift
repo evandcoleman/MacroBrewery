@@ -9,35 +9,6 @@ import SwiftSyntax
 
 extension DeclGroupSyntax {
 
-    var properties: [VariableDeclSyntax] {
-        return memberBlock
-            .members
-            .compactMap { $0.decl.as(VariableDeclSyntax.self) }
-    }
-
-    var functions: [FunctionDeclSyntax] {
-        return memberBlock
-            .members
-            .compactMap { $0.decl.as(FunctionDeclSyntax.self) }
-    }
-
-    var storedProperties: [VariableDeclSyntax] {
-        return properties
-            .filter(\.isStored)
-    }
-
-    var initializers: [InitializerDeclSyntax] {
-        return memberBlock
-            .members
-            .compactMap { $0.decl.as(InitializerDeclSyntax.self) }
-    }
-
-    var associatedTypes: [AssociatedTypeDeclSyntax] {
-        return memberBlock
-            .members
-            .compactMap { $0.decl.as(AssociatedTypeDeclSyntax.self) }
-    }
-
     var inheritedTypes: [TypeSyntax] {
         return inheritanceClause?.inheritedTypes.map(\.type) ?? []
     }
@@ -53,6 +24,48 @@ extension DeclGroupSyntax {
 
         return nil
     }
+
+    var modifiersProvider: DeclModifiersProvider {
+        DeclModifiersProvider(modifiers: modifiers)
+    }
+}
+
+extension MemberBlockSyntax {
+    var properties: [VariableDeclSyntax] {
+        return members
+            .compactMap { $0.decl.as(VariableDeclSyntax.self) }
+    }
+
+    var functions: [FunctionDeclSyntax] {
+        return members
+            .compactMap { $0.decl.as(FunctionDeclSyntax.self) }
+    }
+
+    var storedProperties: [VariableDeclSyntax] {
+        return properties
+            .filter(\.isStored)
+    }
+
+    var initializers: [InitializerDeclSyntax] {
+        return members
+            .compactMap { $0.decl.as(InitializerDeclSyntax.self) }
+    }
+
+    var associatedTypes: [AssociatedTypeDeclSyntax] {
+        return members
+            .compactMap { $0.decl.as(AssociatedTypeDeclSyntax.self) }
+    }
+}
+
+extension ProtocolDeclSyntax {
+
+    var modifiersProvider: DeclModifiersProvider {
+        DeclModifiersProvider(modifiers: modifiers)
+    }
+}
+
+struct DeclModifiersProvider {
+    var modifiers: DeclModifierListSyntax
 
     var accessLevel: String? {
         return modifiers

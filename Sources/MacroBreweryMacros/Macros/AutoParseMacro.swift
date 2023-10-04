@@ -43,6 +43,7 @@ public struct AutoParseMacro: ExtensionMacro {
         }
 
         let properties = declaration
+            .memberBlock
             .storedProperties
             .filter { property in
                 if property.type == nil {
@@ -61,7 +62,7 @@ public struct AutoParseMacro: ExtensionMacro {
 
         guard !properties.isEmpty else { return [] }
 
-        let accessLevel = (node.accessLevel ?? declaration.accessLevel)?.appending(" ") ?? ""
+        let accessLevel = (node.accessLevel ?? declaration.modifiersProvider.accessLevel)?.appending(" ") ?? ""
 
         let syntax: ExtensionDeclSyntax = try ExtensionDeclSyntax("""
         extension \(type): AutoParseable {

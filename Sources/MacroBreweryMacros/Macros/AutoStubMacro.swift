@@ -33,6 +33,7 @@ public struct AutoStubMacro: MemberMacro {
         }
 
         let properties = declaration
+            .memberBlock
             .storedProperties
             .filter { property in
                 if property.type == nil {
@@ -51,7 +52,7 @@ public struct AutoStubMacro: MemberMacro {
 
         guard !properties.isEmpty else { return [] }
 
-        let accessLevel = (attribute.stubAccessLevel ?? declaration.accessLevel)?.appending(" ") ?? ""
+        let accessLevel = (attribute.stubAccessLevel ?? declaration.modifiersProvider.accessLevel)?.appending(" ") ?? ""
 
         let initSyntax: DeclSyntax = """
         #if DEBUG

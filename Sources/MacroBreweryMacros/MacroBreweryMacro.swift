@@ -7,6 +7,7 @@ struct MacroBreweryPlugin: CompilerPlugin {
         AutoInitMacro.self,
         AutoStubAttribute.self,
         AutoStubMacro.self,
+        AutoTypeEraseMacro.self,
         TestEachMacro.self,
     ]
 }
