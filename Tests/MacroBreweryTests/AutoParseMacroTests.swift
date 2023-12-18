@@ -57,6 +57,7 @@ final class AutoParseMacroTests: XCTestCase {
             """
             @AutoParse(from: HouseholdDetails.self)
             struct Household {
+                @AutoParseable
                 var cats: [Cat]
             }
 
@@ -71,6 +72,7 @@ final class AutoParseMacroTests: XCTestCase {
             expandedSource:
             """
             struct Household {
+                @AutoParseable
                 var cats: [Cat]
             }
             struct Cat {
@@ -83,7 +85,9 @@ final class AutoParseMacroTests: XCTestCase {
             extension Household: AutoParseable {
                 init(_ raw: HouseholdDetails) {
                     self.init(
-                        cats: raw.cats.map { Cat($0) }
+                        cats: raw.cats.map {
+                            .init($0)
+                        }
                     )
                 }
             }

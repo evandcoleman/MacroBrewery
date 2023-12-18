@@ -37,6 +37,17 @@ extension VariableDeclSyntax {
         return bindings.lazy.compactMap(\.typeAnnotation).first?.type
     }
 
+    var bindingsForInitializer: PatternBindingListSyntax {
+        return PatternBindingListSyntax(
+            bindings
+                .map { binding in
+                    var newBinding = binding
+                    newBinding.accessorBlock = nil
+                    return newBinding
+                }
+        )
+    }
+
     var defaultInitializerValue: ExprSyntax? {
         return bindings.lazy.compactMap(\.initializer).first?.value
     }

@@ -55,7 +55,6 @@ public struct AutoStubMacro: MemberMacro {
         let accessLevel = (attribute.stubAccessLevel ?? declaration.modifiersProvider.accessLevel)?.appending(" ") ?? ""
 
         let initSyntax: DeclSyntax = """
-        #if DEBUG
         \(raw: accessLevel)static func stub(
         \(raw: makeParameters(for: properties))
         ) -> \(name) {
@@ -67,7 +66,6 @@ public struct AutoStubMacro: MemberMacro {
         )
         )
         }
-        #endif
         """
 
         return [initSyntax]
@@ -77,13 +75,13 @@ public struct AutoStubMacro: MemberMacro {
         return properties
             .map { property in
                 if let stub = property.attribute(named: "Stub"), let value = stub.argumentList?.first {
-                    return "\(property.bindings.map { "\($0.with(\.initializer, nil))" } .joined())= \(value.expression)"
+                    return "\(property.bindingsForInitializer.map { "\($0.with(\.initializer, nil))" } .joined())= \(value.expression)"
                 } else if let _ = property.attribute(named: "Stub") {
-                    return "\(property.bindings.map { "\($0.with(\.initializer, nil))" } .joined())= .stub()"
+                    return "\(property.bindingsForInitializer.map { "\($0.with(\.initializer, nil))" } .joined())= .stub()"
                 } else if property.isOptional, property.defaultInitializerValue == nil {
-                    return "\(property.bindings) = nil"
+                    return "\(property.bindingsForInitializer) = nil"
                 } else {
-                    return "\(property.bindings)"
+                    return "\(property.bindingsForInitializer)"
                 }
             }
             .joined(separator: ",\n")

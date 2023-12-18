@@ -41,7 +41,6 @@ final class AutoStubMacroTests: XCTestCase {
                 public var fuzzy: Bool = true
                 public var small: Bool = false
 
-                #if DEBUG
                 public static func stub(
                     age: Int = 7,
                     name: String? = "Luna",
@@ -57,7 +56,6 @@ final class AutoStubMacroTests: XCTestCase {
                         small: small
                     )
                 }
-                #endif
             }
             """,
             macros: testMacros

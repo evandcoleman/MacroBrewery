@@ -23,7 +23,7 @@ public protocol Animal {
 public struct Household {
 
     @Stub([])
-    public var animals: [Cat]
+    public var animals: [AnyAnimal]
 
     init() {
         animals = []
@@ -32,7 +32,7 @@ public struct Household {
 
 @AutoInit
 @AutoStub
-public struct Cat {
+public struct Cat: Animal {
 
     @Stub(7)
     public var age: Int
@@ -49,25 +49,31 @@ public struct Cat {
         age = 0
         soft = false
     }
+
+    public func pet() async throws {
+
+    }
+
+    public func feed(_ completion: @escaping () -> Void) -> Any {
+        return ""
+    }
 }
 
 let myHome = Household(
     animals: [
-        Cat(
+        AnyAnimal(Cat(
             age: 7,
             name: "Leo",
             soft: true
-        ),
-        Cat(
+        )),
+        AnyAnimal(Cat(
             age: 7,
             name: "Luna",
             soft: false,
             small: true
-        ),
+        )),
     ]
 )
 
-#if DEBUG
 let stubbedHousehold = Household.stub()
 let stubbedCat = Cat.stub()
-#endif

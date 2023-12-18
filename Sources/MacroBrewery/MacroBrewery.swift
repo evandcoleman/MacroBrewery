@@ -21,6 +21,12 @@ public macro AutoParse<T>(
     type: "AutoParseMacro"
 )
 
+@attached(peer, names: overloaded)
+public macro AutoParseable() = #externalMacro(
+    module: "MacroBreweryMacros",
+    type: "AutoParseableAttribute"
+)
+
 @attached(member, names: named(stub))
 public macro AutoStub(
     accessLevel: String? = nil
@@ -59,15 +65,3 @@ public macro testEach<T>(
     module: "MacroBreweryMacros",
     type: "TestEachMacro"
 )
-
-//@propertyWrapper
-//public struct Stub<T> {
-//
-//    public var stubbedValue: T
-//    public var wrappedValue: T?
-//
-//    public init(_ stubbedValue: T, wrappedValue: T? = nil) {
-//        self.stubbedValue = stubbedValue
-//        self.wrappedValue = wrappedValue
-//    }
-//}

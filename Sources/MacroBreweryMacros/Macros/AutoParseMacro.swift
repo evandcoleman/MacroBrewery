@@ -82,7 +82,11 @@ public struct AutoParseMacro: ExtensionMacro {
     }
 
     private static func makeParseIdentifier(property: VariableDeclSyntax) -> String {
-        return "raw.\(property.identifier)"
+        if property.attribute(named: "AutoParseable") != nil {
+            return "raw.\(property.identifier).map { .init($0) }"
+        } else {
+            return "raw.\(property.identifier)"
+        }
     }
 }
 
@@ -107,6 +111,52 @@ extension AutoParseMacro {
                 return "@AutoParse requires an argument with the type to parse from."
             case .propertyTypeRequired:
                 return "@AutoParse requires that properties provide explicit type information."
+            }
+        }
+
+        var diagnosticID: MessageID {
+            .init(domain: "MacroBreweryMacros", id: rawValue)
+        }
+    }
+}
+
+public struct AutoParseableAttribute: PeerMacro {
+
+    public static func expansion(
+        of node: AttributeSyntax,
+        providingPeersOf declaration: some DeclSyntaxProtocol,
+        in context: some MacroExpansionContext
+    ) throws -> [DeclSyntax] {
+        guard declaration.is(VariableDeclSyntax.self) else {
+            context.diagnose(
+                .init(
+                    node: node._syntaxNode,
+                    message: Diagnostic.notProperty
+                )
+            )
+
+            return []
+        }
+
+        return []
+    }
+}
+
+extension AutoParseableAttribute {
+    enum Diagnostic: String, Error, DiagnosticMessage {
+        case notProperty
+
+        var severity: DiagnosticSeverity {
+            switch self {
+            case .notProperty:
+                return .error
+            }
+        }
+
+        var message: String {
+            switch self {
+            case .notProperty:
+                return "@AutoParseable can only be applied to properties."
             }
         }
 

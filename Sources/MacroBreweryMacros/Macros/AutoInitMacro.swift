@@ -70,9 +70,9 @@ public struct AutoInitMacro: MemberMacro {
         return properties
             .map { property in
                 if property.isOptional, property.defaultInitializerValue == nil {
-                    return "\(property.bindings) = nil"
+                    return "\(property.bindingsForInitializer) = nil"
                 } else {
-                    return "\(property.bindings)"
+                    return "\(property.bindingsForInitializer)"
                 }
             }
             .joined(separator: ",\n")
