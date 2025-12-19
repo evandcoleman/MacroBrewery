@@ -44,6 +44,8 @@ extension MemberBlockSyntax {
     var storedProperties: [VariableDeclSyntax] {
         return properties
             .filter(\.isStored)
+            .filter { !$0.isStatic }
+            .filter(\.hasIdentifierPattern)
     }
 
     var initializers: [InitializerDeclSyntax] {
