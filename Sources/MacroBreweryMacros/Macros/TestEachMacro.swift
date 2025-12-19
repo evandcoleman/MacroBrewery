@@ -107,12 +107,3 @@ extension TestEachMacro {
         }
     }
 }
-
-//private extension FunctionDeclSyntax {
-//
-//    var eachValues: ArrayExprSyntax? {
-//        let attribute = attributes.first?.as(AttributeSyntax.self)
-//
-//        return attribute?.a
-//    }
-//}
