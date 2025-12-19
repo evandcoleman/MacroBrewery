@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: ['*']
   pull_request:
     branches: [main]
 
@@ -18,6 +18,9 @@ jobs:
       fail-fast: false
       matrix:
         swift: ['5.9', '5.10']
+        include:
+          - swift: '5.10'
+            coverage: true
     steps:
       - uses: actions/checkout@v4
 
@@ -41,4 +44,22 @@ jobs:
         run: swift build
 
       - name: Run Tests
-        run: swift test
+        run: swift test ${{ matrix.coverage && '--enable-code-coverage' || '' }}
+
+      - name: Generate Coverage Report
+        if: matrix.coverage
+        run: |
+          xcrun llvm-cov export \
+            .build/debug/MacroBreweryPackageTests.xctest/Contents/MacOS/MacroBreweryPackageTests \
+            -instr-profile=.build/debug/codecov/default.profdata \
+            -format=lcov \
+            -ignore-filename-regex='.build|Tests' \
+            > coverage.lcov
+
+      - name: Upload to Codecov
+        if: matrix.coverage
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.lcov
+          fail_ci_if_error: true
