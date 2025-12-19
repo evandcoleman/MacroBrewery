@@ -43,7 +43,6 @@ MacroBreweryMacros (Compiler Plugin)
 | `@AutoTypeErase` | Peer | Generates `Any<Protocol>` type-erased wrapper |
 | `@AutoParse` | Extension | Generates `AutoParseable` conformance for DTO mapping |
 | `@AutoParseable` | Peer | Marks property for nested parsing |
-| `#testEach` | Freestanding Expression | Parameterized XCTest helper |
 
 ### SwiftSyntax Extensions
 

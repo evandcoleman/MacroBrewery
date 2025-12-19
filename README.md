@@ -109,18 +109,6 @@ struct User {
 // }
 ```
 
-### #testEach
-
-Parameterized testing helper for XCTest.
-
-```swift
-func testNumbers() {
-    #testEach([1, 2, 3, 4, 5]) { number in
-        XCTAssertGreaterThan(number, 0)
-    }
-}
-```
-
 ## Access Levels
 
 All macros support an optional `accessLevel` parameter:

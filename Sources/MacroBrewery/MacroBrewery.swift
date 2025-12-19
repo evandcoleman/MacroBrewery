@@ -149,28 +149,3 @@ public macro AutoTypeErase(
     module: "MacroBreweryMacros",
     type: "AutoTypeEraseMacro"
 )
-
-/// Parameterized testing helper that runs a test for each item in an array.
-///
-/// Each test case runs in an `XCTContext.runActivity` for clear test reporting.
-///
-/// - Parameters:
-///   - items: The array of test values.
-///   - test: The test closure to run for each item.
-///
-/// ## Example
-/// ```swift
-/// func testPositiveNumbers() {
-///     #testEach([1, 2, 3, 4, 5]) { number in
-///         XCTAssertGreaterThan(number, 0)
-///     }
-/// }
-/// ```
-@freestanding(expression)
-public macro testEach<T>(
-    _ items: [T],
-    _ test: (T) -> Void
-) = #externalMacro(
-    module: "MacroBreweryMacros",
-    type: "TestEachMacro"
-)
