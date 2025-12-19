@@ -135,4 +135,77 @@ final class AutoInitMacroTests: XCTestCase {
         )
         #endif
     }
+
+    func testEmptyStruct() throws {
+        #if canImport(MacroBreweryMacros)
+        // Empty struct has no stored properties, so no init is generated
+        assertMacroExpansion(
+            """
+            @AutoInit
+            struct Empty {
+            }
+            """,
+            expandedSource:
+            """
+            struct Empty {
+            }
+            """,
+            macros: testMacros
+        )
+        #endif
+    }
+
+    func testOnlyComputedProperties() throws {
+        #if canImport(MacroBreweryMacros)
+        // No stored properties means no init is generated
+        assertMacroExpansion(
+            """
+            @AutoInit
+            struct Computed {
+                var doubled: Int {
+                    return 2
+                }
+            }
+            """,
+            expandedSource:
+            """
+            struct Computed {
+                var doubled: Int {
+                    return 2
+                }
+            }
+            """,
+            macros: testMacros
+        )
+        #endif
+    }
+
+    func testStaticPropertiesIgnored() throws {
+        #if canImport(MacroBreweryMacros)
+        // Static properties should not be included in the initializer
+        assertMacroExpansion(
+            """
+            @AutoInit
+            struct WithStatic {
+                static var shared: Int = 0
+                var name: String
+            }
+            """,
+            expandedSource:
+            """
+            struct WithStatic {
+                static var shared: Int = 0
+                var name: String
+
+                init(
+                    name: String
+                ) {
+                    self.name = name
+                }
+            }
+            """,
+            macros: testMacros
+        )
+        #endif
+    }
 }
