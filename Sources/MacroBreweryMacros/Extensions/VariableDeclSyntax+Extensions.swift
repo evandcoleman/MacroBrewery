@@ -28,9 +28,19 @@ extension VariableDeclSyntax {
     }
 
     var identifier: TokenSyntax {
+        guard let id = bindings.lazy
+            .compactMap({ $0.pattern.as(IdentifierPatternSyntax.self) })
+            .first?.identifier
+        else {
+            preconditionFailure("VariableDeclSyntax missing identifier pattern - this indicates unsupported syntax (e.g., tuple patterns)")
+        }
+        return id
+    }
+
+    var hasIdentifierPattern: Bool {
         return bindings.lazy
             .compactMap { $0.pattern.as(IdentifierPatternSyntax.self) }
-            .first!.identifier
+            .first != nil
     }
 
     var type: TypeSyntax? {

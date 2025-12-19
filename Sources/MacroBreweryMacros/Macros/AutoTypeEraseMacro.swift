@@ -21,7 +21,6 @@ public struct AutoTypeEraseMacro: PeerMacro {
         guard
             let proto = declaration.as(ProtocolDeclSyntax.self)
         else {
-            print(type(of: declaration))
             context.diagnose(
                 .init(
                     node: node._syntaxNode,
@@ -35,6 +34,7 @@ public struct AutoTypeEraseMacro: PeerMacro {
         let properties = proto
             .memberBlock
             .storedProperties
+            .filter { $0.type != nil }
         let functions = proto
             .memberBlock
             .functions
