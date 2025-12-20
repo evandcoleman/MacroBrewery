@@ -44,15 +44,25 @@ jobs:
       - name: Run Tests
         run: swift test ${{ matrix.coverage && '--enable-code-coverage' || '' }}
 
-      - name: Get Coverage Path
+      - name: Convert Coverage to LCOV
         if: matrix.coverage
-        id: coverage
-        run: echo "path=$(swift test --show-codecov-path)" >> $GITHUB_OUTPUT
+        run: |
+          PROFDATA_PATH=$(find .build -name 'default.profdata' -type f 2>/dev/null | head -1)
+          TEST_BINARY=$(find .build -name 'MacroBreweryPackageTests' -type f -perm +111 2>/dev/null | head -1)
+
+          if [ -n "$PROFDATA_PATH" ] && [ -n "$TEST_BINARY" ]; then
+            xcrun llvm-cov export \
+              "$TEST_BINARY" \
+              --instr-profile="$PROFDATA_PATH" \
+              --format=lcov \
+              --ignore-filename-regex='.build|Tests' \
+              > coverage.lcov
+          fi
 
       - name: Upload to Codecov
         if: matrix.coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ steps.coverage.outputs.path }}
+          files: coverage.lcov
           fail_ci_if_error: false
