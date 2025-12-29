@@ -180,3 +180,34 @@ public macro AutoBuilder(
     module: "MacroBreweryMacros",
     type: "AutoBuilderMacro"
 )
+
+/// Generates computed properties for enum cases.
+///
+/// For each case, generates:
+/// - `is{CaseName}: Bool` - checks if self matches that case
+/// - `{caseName}: AssociatedType?` - extracts associated values if present
+///
+/// - Parameter accessLevel: The access level for the generated properties.
+///
+/// ## Example
+/// ```swift
+/// @EnumProperties
+/// enum LoadingState {
+///     case idle
+///     case loading(progress: Double)
+///     case loaded(data: Data)
+///     case failed(error: Error)
+/// }
+///
+/// let state = LoadingState.loading(progress: 0.5)
+/// state.isLoading  // true
+/// state.loading    // Optional(0.5)
+/// state.loaded     // nil
+/// ```
+@attached(member, names: arbitrary)
+public macro EnumProperties(
+    accessLevel: String? = nil
+) = #externalMacro(
+    module: "MacroBreweryMacros",
+    type: "EnumPropertiesMacro"
+)

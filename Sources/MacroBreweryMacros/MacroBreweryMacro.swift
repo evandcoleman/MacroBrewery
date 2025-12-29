@@ -11,5 +11,6 @@ struct MacroBreweryPlugin: CompilerPlugin {
         AutoStubAttribute.self,
         AutoStubMacro.self,
         AutoTypeEraseMacro.self,
+        EnumPropertiesMacro.self,
     ]
 }
