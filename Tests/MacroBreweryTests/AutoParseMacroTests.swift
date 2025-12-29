@@ -562,4 +562,81 @@ final class AutoParseMacroTests: XCTestCase {
         )
         #endif
     }
+
+    func testMissingFromArgument() throws {
+        #if canImport(MacroBreweryMacros)
+        assertMacroExpansion(
+            """
+            @AutoParse
+            struct User {
+                var name: String
+            }
+            """,
+            expandedSource:
+            """
+            struct User {
+                var name: String
+            }
+            """,
+            diagnostics: [
+                DiagnosticSpec(message: "@AutoParse requires an argument with the type to parse from.", line: 1, column: 1)
+            ],
+            macros: testMacros
+        )
+        #endif
+    }
+
+    func testAutoParseableOnNonProperty() throws {
+        #if canImport(MacroBreweryMacros)
+        assertMacroExpansion(
+            """
+            @AutoParseable
+            func doSomething() {}
+            """,
+            expandedSource:
+            """
+            func doSomething() {}
+            """,
+            diagnostics: [
+                DiagnosticSpec(message: "@AutoParseable can only be applied to properties.", line: 1, column: 1)
+            ],
+            macros: testMacros
+        )
+        #endif
+    }
+
+    func testNestedOptionalObject() throws {
+        #if canImport(MacroBreweryMacros)
+        // Test @AutoParseable on optional single object (uses .map { .init($0) })
+        assertMacroExpansion(
+            """
+            @AutoParse(from: OrderDTO.self)
+            struct Order {
+                var id: String
+                @AutoParseable
+                var customer: Customer?
+            }
+            """,
+            expandedSource:
+            """
+            struct Order {
+                var id: String
+                var customer: Customer?
+            }
+
+            extension Order: AutoParseable {
+                init(_ raw: OrderDTO) {
+                    self.init(
+                        id: raw.id,
+                        customer: raw.customer.map {
+                            .init($0)
+                        }
+                    )
+                }
+            }
+            """,
+            macros: testMacros
+        )
+        #endif
+    }
 }

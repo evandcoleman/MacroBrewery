@@ -547,4 +547,81 @@ final class AutoStubMacroTests: XCTestCase {
         )
         #endif
     }
+
+    func testStubOnNonProperty() throws {
+        #if canImport(MacroBreweryMacros)
+        assertMacroExpansion(
+            """
+            @Stub("test")
+            func doSomething() {}
+            """,
+            expandedSource:
+            """
+            func doSomething() {}
+            """,
+            diagnostics: [
+                DiagnosticSpec(message: "@Stub can only be applied to properties.", line: 1, column: 1)
+            ],
+            macros: testMacros
+        )
+        #endif
+    }
+
+    func testAccessLevelFileprivate() throws {
+        #if canImport(MacroBreweryMacros)
+        assertMacroExpansion(
+            """
+            @AutoStub(accessLevel: "fileprivate")
+            struct User {
+                @Stub("Test")
+                var name: String
+            }
+            """,
+            expandedSource:
+            """
+            struct User {
+                var name: String
+
+                fileprivate static func stub(
+                    name: String = "Test"
+                ) -> User {
+                    User(
+                        name: name
+                    )
+                }
+            }
+            """,
+            macros: testMacros
+        )
+        #endif
+    }
+
+    func testAccessLevelInternal() throws {
+        #if canImport(MacroBreweryMacros)
+        assertMacroExpansion(
+            """
+            @AutoStub(accessLevel: "internal")
+            struct User {
+                @Stub("Test")
+                var name: String
+            }
+            """,
+            expandedSource:
+            """
+            struct User {
+                var name: String
+
+                internal static func stub(
+                    name: String = "Test"
+                ) -> User {
+                    User(
+                        name: name
+                    )
+                }
+            }
+            """,
+            macros: testMacros
+        )
+        #endif
+    }
 }
