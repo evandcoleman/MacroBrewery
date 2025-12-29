@@ -1,7 +1,7 @@
 # MacroBrewery
 
 [![CI](https://github.com/evandcoleman/MacroBrewery/actions/workflows/ci.yml/badge.svg)](https://github.com/evandcoleman/MacroBrewery/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/evandcoleman/MacroBrewery/graph/badge.svg)](https://codecov.io/gh/evandcoleman/MacroBrewery)
+[![codecov](https://codecov.io/gh/evandcoleman/MacroBrewery/branch/main/graph/badge.svg)](https://codecov.io/gh/evandcoleman/MacroBrewery)
 
 A collection of useful Swift macros for code generation.
 
