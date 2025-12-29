@@ -149,3 +149,34 @@ public macro AutoTypeErase(
     module: "MacroBreweryMacros",
     type: "AutoTypeEraseMacro"
 )
+
+/// Generates a Builder pattern for struct construction.
+///
+/// Creates a nested `Builder` class with fluent setter methods and a `build()` method.
+/// Properties with default values or optionals don't require being set.
+///
+/// - Parameter accessLevel: The access level for the generated builder.
+///
+/// ## Example
+/// ```swift
+/// @AutoBuilder
+/// struct NetworkRequest {
+///     var url: URL
+///     var method: String = "GET"
+///     var headers: [String: String] = [:]
+///     var timeout: TimeInterval = 30
+/// }
+///
+/// let request = NetworkRequest.builder()
+///     .url(myURL)
+///     .method("POST")
+///     .timeout(60)
+///     .build()
+/// ```
+@attached(member, names: named(Builder), named(builder))
+public macro AutoBuilder(
+    accessLevel: String? = nil
+) = #externalMacro(
+    module: "MacroBreweryMacros",
+    type: "AutoBuilderMacro"
+)
