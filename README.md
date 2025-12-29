@@ -110,6 +110,47 @@ struct User {
 // }
 ```
 
+### @AutoBuilder
+
+Generates a Builder pattern for struct construction with fluent API.
+
+```swift
+@AutoBuilder
+struct NetworkRequest {
+    var url: URL
+    var method: String = "GET"
+    var timeout: TimeInterval = 30
+}
+
+// Usage:
+let request = NetworkRequest.builder()
+    .url(myURL)
+    .method("POST")
+    .timeout(60)
+    .build()
+```
+
+### @EnumProperties
+
+Generates computed properties for enum case checking and associated value extraction.
+
+```swift
+@EnumProperties
+enum LoadingState {
+    case idle
+    case loading(progress: Double)
+    case success(data: Data)
+    case failure(error: Error)
+}
+
+// Generated properties:
+let state = LoadingState.loading(progress: 0.5)
+state.isLoading  // true
+state.loading    // Optional(0.5)
+state.isSuccess  // false
+state.success    // nil
+```
+
 ## Access Levels
 
 All macros support an optional `accessLevel` parameter:
